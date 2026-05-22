@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generate } from '@/lib/claude/client'
+import { generate, hasRealApiKey } from '@/lib/claude/client'
+import { demoPost, delay } from '@/lib/claude/demo'
 
 export async function POST(req: NextRequest) {
   try {
     const { description, tone } = await req.json()
     if (!description) return NextResponse.json({ error: 'Description requise' }, { status: 400 })
+
+    if (!hasRealApiKey()) {
+      await delay(1600)
+      return NextResponse.json({ caption: demoPost(description), demo: true })
+    }
 
     const prompt = `Tu es un expert en marketing Instagram pour "John Paul Optique", un magasin d'optique premium.
 Je vais publier : "${description}"
@@ -19,12 +25,11 @@ Structure attendue :
 4. — (séparateur)
 5. HASHTAGS : 20 à 25 hashtags pertinents (mélange français/anglais, général + niche optique)
 
-Règles importantes :
-- Emojis : quelques-uns mais pas excessifs, bien placés
-- Ton : premium, chaleureux, moderne, jamais agressif
-- Pas de clichés ("Découvrez notre...", "N'attendez plus...")
-- La première ligne doit être magnétique
-- Les hashtags incluent : optique, lunettes, opticien, vision, style, santé visuelle + localisation si applicable`
+Règles :
+- Emojis : quelques-uns mais pas excessifs
+- Ton : premium, chaleureux, moderne
+- Pas de clichés
+- La première ligne doit être magnétique`
 
     const caption = await generate(prompt, 1024)
     return NextResponse.json({ caption })

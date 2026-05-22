@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generate } from '@/lib/claude/client'
+import { generate, hasRealApiKey } from '@/lib/claude/client'
+import { demoCarousel, delay } from '@/lib/claude/demo'
 
 export async function POST(req: NextRequest) {
   try {
     const { subject, style } = await req.json()
     if (!subject) return NextResponse.json({ error: 'Sujet requis' }, { status: 400 })
+
+    if (!hasRealApiKey()) {
+      await delay(1800)
+      return NextResponse.json({ result: demoCarousel(subject), demo: true })
+    }
 
     const prompt = `Tu es un expert en marketing Instagram pour opticiens premium (magasin "John Paul Optique").
 Crée un carrousel Instagram complet sur le sujet : "${subject}"
@@ -30,7 +36,6 @@ Règles :
 - Ton : moderne, premium, professionnel mais chaleureux`
 
     const raw = await generate(prompt, 2048)
-
     let result
     try {
       result = JSON.parse(raw)
@@ -38,7 +43,6 @@ Règles :
       const match = raw.match(/\{[\s\S]*\}/)
       result = match ? JSON.parse(match[0]) : { slides: [], caption: raw }
     }
-
     return NextResponse.json({ result })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

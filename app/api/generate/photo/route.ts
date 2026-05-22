@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generate, generateWithImage } from '@/lib/claude/client'
+import { generate, generateWithImage, hasRealApiKey } from '@/lib/claude/client'
+import { demoPhoto, delay } from '@/lib/claude/demo'
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,13 +9,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Image ou description requise' }, { status: 400 })
     }
 
-    const prompt = `Tu es expert en marketing visuel Instagram pour "John Paul Optique", magasin d'optique premium.
-${description ? `Description de l'image : "${description}"` : 'Analyse cette image.'}
+    if (!hasRealApiKey()) {
+      await delay(2000)
+      return NextResponse.json({ analysis: demoPhoto(description || ''), demo: true })
+    }
 
-Propose une analyse complète pour Instagram. Réponds avec ce format structuré :
+    const prompt = `Tu es expert en marketing visuel Instagram pour "John Paul Optique", magasin d'optique premium.
+${description ? `Description : "${description}"` : 'Analyse cette image.'}
+
+Propose une analyse complète pour Instagram :
 
 📝 TEXTE PRINCIPAL À SUPERPOSER
-(1 phrase percutante, max 6 mots, style typographie Instagram)
+(1 phrase percutante, max 6 mots)
 
 💬 SOUS-TEXTE OPTIONNEL
 (Complément, max 10 mots)
@@ -23,16 +29,13 @@ Propose une analyse complète pour Instagram. Réponds avec ce format structuré
 (Caption complète : accroche + corps + CTA + hashtags)
 
 🎨 IDÉE DE MONTAGE
-(Comment améliorer ou mettre en valeur : recadrage, couleurs, filtre suggéré, éléments à ajouter)
+(Recadrage, couleurs, filtre, éléments à ajouter)
 
-🖼️ VERSION CARROUSEL (si applicable)
-Slide 1 : [accroche]
-Slide 2 : [contenu]
-Slide 3 : [contenu]
-Slide 4 : [CTA]
+🖼️ VERSION CARROUSEL
+Slide 1 / Slide 2 / Slide 3 / Slide 4
 
 ✨ CONSEIL CRÉATIF
-(Astuce pour rendre ce post encore plus premium et engageant)`
+(Astuce pour rendre ce post encore plus premium)`
 
     let analysis: string
     if (imageBase64 && mediaType) {

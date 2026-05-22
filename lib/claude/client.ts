@@ -1,8 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+function hasRealApiKey() {
+  const key = process.env.ANTHROPIC_API_KEY
+  return key && key !== 'your_anthropic_api_key' && key.startsWith('sk-')
+}
 
 export async function generate(prompt: string, maxTokens = 2048): Promise<string> {
+  if (!hasRealApiKey()) throw new Error('NO_API_KEY')
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const res = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: maxTokens,
@@ -16,6 +21,8 @@ export async function generateWithImage(
   imageBase64: string,
   mediaType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
 ): Promise<string> {
+  if (!hasRealApiKey()) throw new Error('NO_API_KEY')
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const res = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
@@ -31,3 +38,5 @@ export async function generateWithImage(
   })
   return res.content[0].type === 'text' ? res.content[0].text : ''
 }
+
+export { hasRealApiKey }
