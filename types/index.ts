@@ -1,48 +1,27 @@
-export interface Email {
-  id: string
-  threadId: string
-  from: string
-  fromName: string
-  to: string
-  subject: string
-  body: string
-  bodyHtml?: string
-  receivedAt: string
-  isRead: boolean
-  labels: string[]
-  snippet: string
+export interface CarouselSlide {
+  number: number
+  type: 'accroche' | 'contenu' | 'cta'
+  emoji: string
+  title: string
+  content: string
 }
 
-export interface EmailDraft {
-  id?: string
-  emailId: string
-  subject: string
-  body: string
-  to: string
-  generatedAt: string
-  status: 'pending' | 'sent' | 'discarded'
-  tone: 'professional' | 'friendly' | 'formal'
+export interface CarouselResult {
+  slides: CarouselSlide[]
+  caption: string
 }
 
-export interface Agent {
-  id: string
-  name: string
-  description: string
-  status: 'active' | 'inactive' | 'running'
-  type: 'email' | 'instagram' | 'google_reviews' | 'marketing'
-  lastRun?: string
-  tasksCompleted: number
+export interface VideoIdea {
+  title: string
+  hook: string
+  structure: string[]
+  screenText: string[]
+  script: string
+  caption: string
 }
 
-export interface DashboardStats {
-  emailsToProcess: number
-  draftsGenerated: number
-  agentsActive: number
-  postsScheduled: number
+export interface VideoIdeasResult {
+  ideas: VideoIdea[]
 }
 
-export interface GmailToken {
-  access_token: string
-  refresh_token: string
-  expiry_date: number
-}
+export type Tool = 'carousel' | 'post' | 'story' | 'videos' | 'photo'

@@ -1,142 +1,98 @@
-'use client'
-
-import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
-import { StatsCard } from '@/components/dashboard/StatsCard'
-import { AgentCard } from '@/components/dashboard/AgentCard'
-import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import {
-  Mail, FileText, Bot, Calendar, Zap,
-  CheckCircle, AlertCircle, ArrowRight, Wifi
-} from 'lucide-react'
 import Link from 'next/link'
-import type { Agent } from '@/types'
+import { Layers, FileText, Smartphone, Video, ScanSearch, ArrowRight } from 'lucide-react'
 
-const AGENTS: Agent[] = [
+const tools = [
   {
-    id: '1',
-    name: 'Email Assistant',
-    description: 'Génère automatiquement des brouillons de réponses pour vos emails clients.',
-    status: 'active',
-    type: 'email',
-    tasksCompleted: 42,
-    lastRun: new Date().toISOString(),
+    href: '/dashboard/carousel',
+    icon: Layers,
+    label: 'Carrousel',
+    description: 'Génère un carrousel Instagram complet slide par slide sur n\'importe quel sujet.',
+    color: 'bg-violet-500',
+    glow: 'hover:shadow-violet-100',
+    badge: 'Populaire',
   },
   {
-    id: '2',
-    name: 'Google Reviews',
-    description: 'Répond automatiquement aux avis Google Business de votre magasin.',
-    status: 'inactive',
-    type: 'google_reviews',
-    tasksCompleted: 0,
+    href: '/dashboard/post',
+    icon: FileText,
+    label: 'Description post',
+    description: 'Décris ta photo ou vidéo, l\'IA écrit la légende parfaite avec hashtags et CTA.',
+    color: 'bg-sky-500',
+    glow: 'hover:shadow-sky-100',
+    badge: null,
   },
   {
-    id: '3',
-    name: 'Instagram Agent',
-    description: 'Génère et programme des posts Instagram pour votre magasin.',
-    status: 'inactive',
-    type: 'instagram',
-    tasksCompleted: 0,
+    href: '/dashboard/story',
+    icon: Smartphone,
+    label: 'Story',
+    description: 'Texte accrocheur, idées de stickers, sondages et appels à l\'action pour tes stories.',
+    color: 'bg-pink-500',
+    glow: 'hover:shadow-pink-100',
+    badge: null,
+  },
+  {
+    href: '/dashboard/videos',
+    icon: Video,
+    label: 'Idées vidéos',
+    description: 'Scripts de Reels, hooks, textes à l\'écran et descriptions — faciles à tourner en magasin.',
+    color: 'bg-amber-500',
+    glow: 'hover:shadow-amber-100',
+    badge: null,
+  },
+  {
+    href: '/dashboard/photo',
+    icon: ScanSearch,
+    label: 'Analyse photo',
+    description: 'Envoie une photo, l\'IA propose texte, montage, description et idée de carrousel.',
+    color: 'bg-emerald-500',
+    glow: 'hover:shadow-emerald-100',
+    badge: 'Vision IA',
   },
 ]
 
-const AGENT_ICONS = { email: Mail, google_reviews: CheckCircle, instagram: Zap, marketing: Calendar }
-
-function DashboardContent() {
-  const searchParams = useSearchParams()
-  const gmailConnected = searchParams.get('gmail') === 'connected'
-  const error = searchParams.get('error')
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-0.5">John Paul Optique — Centre de commande IA</p>
-        </div>
-        <Link href="/api/auth/gmail">
-          <Button size="sm" variant={gmailConnected ? 'secondary' : 'primary'}>
-            <Wifi className="w-4 h-4" />
-            {gmailConnected ? 'Gmail connecté' : 'Connecter Gmail'}
-          </Button>
-        </Link>
-      </div>
-
-      {/* Connection alerts */}
-      {gmailConnected && (
-        <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-700">
-          <CheckCircle className="w-4 h-4 flex-shrink-0" />
-          Gmail connecté avec succès. L'Email Assistant peut maintenant lire vos emails.
-        </div>
-      )}
-      {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          Erreur de connexion Gmail. Veuillez réessayer.
-        </div>
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Emails à traiter" value={12} icon={Mail} color="indigo" description="Non lus aujourd'hui" />
-        <StatsCard title="Brouillons générés" value={8} icon={FileText} color="emerald" description="Cette semaine" />
-        <StatsCard title="Agents actifs" value={1} icon={Bot} color="blue" description="Sur 3 disponibles" />
-        <StatsCard title="Posts planifiés" value={0} icon={Calendar} color="amber" description="Instagram — bientôt" />
-      </div>
-
-      {/* Quick access */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Accès rapide</CardTitle>
-        </CardHeader>
-        <Link href="/dashboard/emails">
-          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition-all cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center">
-                <Mail className="w-5 h-5 text-indigo-600" />
-              </div>
-              <div>
-                <p className="font-medium text-sm text-gray-900">Email Assistant</p>
-                <p className="text-xs text-gray-500">Générer des réponses à vos emails clients</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="success">Actif</Badge>
-              <ArrowRight className="w-4 h-4 text-gray-400" />
-            </div>
-          </div>
-        </Link>
-      </Card>
-
-      {/* Agents */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900">Agents IA</h2>
-          <Link href="/dashboard/agents">
-            <Button variant="ghost" size="sm">Voir tout <ArrowRight className="w-4 h-4" /></Button>
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {AGENTS.map((agent) => (
-            <AgentCard
-              key={agent.id}
-              agent={agent}
-              icon={AGENT_ICONS[agent.type] || Bot}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="text-gray-500">Chargement...</div>}>
-      <DashboardContent />
-    </Suspense>
+    <div className="px-10 py-10 max-w-4xl">
+      {/* Header */}
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+          Studio Instagram IA
+        </h1>
+        <p className="text-slate-500 mt-2 text-base">
+          Créez du contenu professionnel pour votre magasin en quelques secondes.
+        </p>
+      </div>
+
+      {/* Tool grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {tools.map(({ href, icon: Icon, label, description, color, glow, badge }) => (
+          <Link key={href} href={href}>
+            <div className={`group bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg ${glow} transition-all duration-200 hover:-translate-y-0.5 cursor-pointer h-full`}>
+              <div className="flex items-start justify-between mb-4">
+                <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shadow-sm`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex items-center gap-2">
+                  {badge && (
+                    <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                      {badge}
+                    </span>
+                  )}
+                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
+                </div>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-1.5">{label}</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Tip */}
+      <div className="mt-8 p-4 bg-violet-50 border border-violet-100 rounded-xl">
+        <p className="text-sm text-violet-700">
+          <span className="font-semibold">Astuce :</span> Chaque outil est optimisé pour un magasin d'optique premium. Plus tu es précis dans ta description, plus le résultat est qualitatif.
+        </p>
+      </div>
+    </div>
   )
 }
